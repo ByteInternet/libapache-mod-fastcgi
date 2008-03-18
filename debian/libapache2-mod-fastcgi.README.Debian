@@ -1,0 +1,29 @@
+
+Config Tips
+----------------------
+
+ * How to run your FastCGI app
+
+   In case that FastCGI script has ".fcgi" suffix, you just put the script
+   in /usr/lib/cgi-bin (or other directory has "+ExecCGI") and can run it.
+
+ * Using non-".fcgi" suffix
+
+   If your app have non-".fcgi" suffix, add AddHandler/SetHandler to httpd.conf.
+   For exapmple;
+   ---
+     <Directory /var/www/myfcgiapp>
+       AddHandler fastcgi-script .yourext .pl .rb .cgi .sh
+     </Directory>
+   ---
+
+ * How to run under SuExec
+
+   make enable following line;
+     #FastCgiWrapper /usr/lib/apache2/suexec
+   in /etc/apache2/mods-enabled/fastcgi.conf
+
+ * If you change apache's uid
+
+   You need to change owner of /var/lib/apache*/fastcgi to uid of apache run.
+

@@ -1,0 +1,19 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## by Troestler Christophe <Christophe.Troestler@umh.ac.be>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: fix for document dead link 
+## DP: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=288270
+
+@DPATCH@
+--- libapache-mod-fastcgi-2.4.6.orig/docs/mod_fastcgi.html
++++ libapache-mod-fastcgi-2.4.6/docs/mod_fastcgi.html
+@@ -67,7 +67,7 @@
+         </P>
+         <P>
+             FastCGI applications under <CODE>mod_fastcgi</CODE> are defined as one of three types: static, dynamic, or
+-            external. They&#39;re configured using the <A HREF="#fastcgiserver">FastCgiServer</A>, <A HREF=
++            external. They&#39;re configured using the <A HREF="#FastCgiServer">FastCgiServer</A>, <A HREF=
+             "#FastCgiConfig">FastCgiConfig</A>, and <A HREF="#FastCgiExternalServer">FastCgiExternalServer</A> <A HREF=
+             "#directives">directives</A> respectively. Any URI that Apache identifies as a FastCGI application and
+             which hasn&#39;t been explicitly configured using a <A HREF="#fastcgiserver">FastCgiServer</A> or <A HREF=

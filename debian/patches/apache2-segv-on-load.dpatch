@@ -1,0 +1,30 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## apache2-segv-on-load.dpatch by  <sugi@nemui.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: See the URL for details.
+## DP: http://www.fastcgi.com/archives/fastcgi-developers/2005-April/003673.html
+
+@DPATCH@
+diff -urNad libapache-mod-fastcgi~/mod_fastcgi.c libapache-mod-fastcgi/mod_fastcgi.c
+--- libapache-mod-fastcgi~/mod_fastcgi.c	2005-08-06 14:09:11.000000000 +0900
++++ libapache-mod-fastcgi/mod_fastcgi.c	2006-10-06 20:52:46.368480801 +0900
+@@ -2850,10 +2850,15 @@
+ 
+     get_request_identity(r, &uid, &gid);
+ 
+-    if (fcgi_util_fs_get_by_id(r->filename, uid, gid))
++    /* Only try this if r->filename is not NULL,
++     * otherwise Apache 2 crashes with SIGSEGV... */
++    if (r->filename)
+     {
+-        r->handler = FASTCGI_HANDLER_NAME;
+-        return OK;
++        if (fcgi_util_fs_get_by_id(r->filename, uid, gid))
++        {
++            r->handler = FASTCGI_HANDLER_NAME;
++            return OK;
++        }
+     }
+ 
+     return DECLINED;

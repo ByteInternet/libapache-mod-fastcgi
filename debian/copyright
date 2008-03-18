@@ -5,6 +5,24 @@ It was downloaded from http://www.fastcgi.com/
 
 Copyright:
 
+ Copyright (c) 1995-1996 Open Market, Inc.
+
+Authors:
+
+ *  Patches for Apache-1.1 provided by
+    Ralf S. Engelschall
+    <rse@en.muc.de>
+ *  Patches for Linux provided by
+    Scott Langley
+    <langles@vote-smart.org>
+ *  Patches for suexec handling by
+    Brian Grossman <brian@SoftHome.net> and
+    Rob Saccoccio <robs@ipass.net>
+
+--------------------------------------------------------------------
+ mod_fastcgi license terms
+--------------------------------------------------------------------
+
 This FastCGI application library source and object code (the
 "Software") and its documentation (the "Documentation") are
 copyrighted by Open Market, Inc ("Open Market").  The following terms

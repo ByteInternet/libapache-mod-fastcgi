@@ -1,10 +1,93 @@
-libapache-mod-fastcgi (2.4.1) unstable; urgency=low
+libapache-mod-fastcgi (2.4.6-1) unstable; urgency=low
 
-  * Debian builds adopted by upstream.  See the CHANGES file for a
-    list of changes since the last release.  Patches from the Debian
-    project most welcome :-)
+  * New upstream release
 
- -- Sam Vilain <sam@vilain.net>  Thu, 13 Nov 2003 02:00:37 +0000
+ -- Tatsuki Sugiura <sugi@nemui.org>  Tue, 18 Mar 2008 11:23:42 +0900
+
+libapache-mod-fastcgi (2.4.2-10) unstable; urgency=low
+
+  * Drop apache1.3 module. (Closes: #429095)
+  * Now this cannot be built with apache2.0.
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Mon, 28 Jan 2008 15:17:58 +0900
+
+libapache-mod-fastcgi (2.4.2-9) unstable; urgency=low
+
+  * apply authn provider patch for apache2.2.
+    Thanks for Martin Furter (Closes: #414185)
+  * stop build apache 1.3 binary (Closes: #429095)
+  * fix suexec wrapper path (Closes: #415913)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sat, 25 Aug 2007 17:13:50 +0900
+
+libapache-mod-fastcgi (2.4.2-8) unstable; urgency=high
+
+  * transit libapache2-mod-fastcgi for apache2.2
+  * Fix in built-in suexec path (Closes: #331617)
+  * remove unnecessary libc6 version dependency (Closes: #343519)
+  * apply patch to fix that apache2 segv on load (Closes: #343514)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Fri,  6 Oct 2006 20:53:21 +0900
+
+libapache-mod-fastcgi (2.4.2-7) unstable; urgency=low
+
+  * Update description. Thanks for Russ Allbery. (Closes: #320246)
+  * a2{en,dis}cmd automatically called in postinst/prerm. (Closes: #320246)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sat,  6 Aug 2005 14:18:30 +0900
+
+libapache-mod-fastcgi (2.4.2-6) unstable; urgency=low
+
+  * fix typo in original document (Closes: #288270)
+  * add config topic in README.Debian (Closes: #298819)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Wed, 16 Mar 2005 22:27:02 +0900
+
+libapache-mod-fastcgi (2.4.2-5) unstable; urgency=high
+
+  * SuEXEC setting has been disabled in defualt. (Closes: #275201)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Tue, 19 Oct 2004 13:38:17 +0900
+
+libapache-mod-fastcgi (2.4.2-4) unstable; urgency=low
+
+  * Add Documentation
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Wed,  8 Sep 2004 18:15:05 +0900
+
+libapache-mod-fastcgi (2.4.2-3) unstable; urgency=high
+
+  * Back out the ill-fated apache2 LFS transition.
+  * Bump the apache2-{threaded,prefork}-dev build-dep to (>= 2.0.50-10)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Tue, 24 Aug 2004 22:44:11 +0900
+
+libapache-mod-fastcgi (2.4.2-2) unstable; urgency=medium
+
+  * rebuild for new ABI of apache2 2.0.50-9
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Tue, 17 Aug 2004 15:08:04 +0900
+
+libapache-mod-fastcgi (2.4.2-1) unstable; urgency=low
+
+  * Upstream Release.
+  * New Maintainer (Closes: #229214)
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Sat, 24 Jul 2004 06:07:47 +0900
+
+libapache-mod-fastcgi (2.4.0-4) unstable; urgency=low
+
+  * QA upload.
+  * libdb4.1-dev build-dependency removed. (Closes: #243017)
+  * Standards-Version updated.
+
+ -- Emanuele Rocca <ema@debian.org>  Tue, 13 Apr 2004 18:09:33 +0200
+
+libapache-mod-fastcgi (2.4.0-3) unstable; urgency=low
+
+  * Orphaned.
+
+ -- Davide Puricelli (evo) <evo@debian.org>  Fri, 23 Jan 2004 19:15:54 +0100
 
 libapache-mod-fastcgi (2.4.0-2) unstable; urgency=low
 

@@ -1,18 +1,19 @@
 Source: libapache-mod-fastcgi
 Section: non-free/web
 Priority: optional
-Maintainer: Sam Vilain <sam@vilain.net>
-Standards-Version: 3.5.8.0
-Build-Depends: apache-dev (>= 1.3.0), debhelper (>> 3.0.0), lynx, libdb2-dev
+Maintainer: Tatsuki Sugiura <sugi@nemui.org>
+Standards-Version: 3.7.3
+Build-Depends: debhelper (>> 3.0.0), cdbs, apache2-threaded-dev (>= 2.2.4) | apache2-prefork-dev (>= 2.2.4), dpatch (>= 2.0.0), libtool, libapr1-dev, pkg-config
+Uploaders: Taku YASUI <tach@debian.or.jp>
 
-Package: libapache-mod-fastcgi
+Package: libapache2-mod-fastcgi
 Architecture: any
-Depends: apache-common (>= 1.3.0), ${shlibs:Depends}
-Description: FastCGI module for Apache
- This package contains a FastCGI module for the Apache (1.3) web
- server.
- .
- FastCGI is an open standard for communicating between a web server
- and a web application, supported by many free and closed source web
- servers.  It provides CGI-like functionality, without the need to
- program to a particular server API.
+Depends: apache2.2-common (>= 2.2.4), ${shlibs:Depends}
+Description: Apache 2 FastCGI module for long-running CGI scripts
+ This is a FastCGI module for the Apache 2.x web server.  FastCGI is an
+ open standard for communicating between a web server and a long-running
+ web application.  CGI scripts supporting FastCGI can be started as a
+ daemon and process multiple requests without restarting.  This is
+ particularly useful for scripts written in languages like Perl, as it
+ saves the cost of recompiling the scripts and its loaded modules with
+ each invocation.

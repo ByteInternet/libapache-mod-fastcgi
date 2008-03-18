@@ -1,0 +1,5 @@
+version=2
+
+http://www.fastcgi.com/dist/ \
+	mod_fastcgi-([\d.]+)\.tar\.gz \
+	debian uupdate

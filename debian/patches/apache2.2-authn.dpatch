@@ -1,0 +1,114 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## apache2.2-authn.dpatch by  <sugi@nemui.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: mod_fastcgi works as AUTHN provider for apache 2.2
+## 
+
+@DPATCH@
+diff -urNad libapache-mod-fastcgi~/mod_fastcgi.c libapache-mod-fastcgi/mod_fastcgi.c
+--- libapache-mod-fastcgi~/mod_fastcgi.c	2006-10-06 21:55:39.000000000 +0900
++++ libapache-mod-fastcgi/mod_fastcgi.c	2007-08-25 16:51:25.000000000 +0900
+@@ -82,6 +82,10 @@
+ 
+ #include "unixd.h"
+ 
++#ifdef APACHE22
++#include "mod_auth.h"
++#endif
++
+ #endif
+ #endif
+ 
+@@ -2657,10 +2661,15 @@
+     r->status_line = NULL;
+ }
+ 
++#ifdef APACHE22
++static authn_status check_user_authentication(request_rec *r, const char *user, const char *password)
++{
++#else /* !APACHE22 */
+ static int check_user_authentication(request_rec *r)
+ {
+-    int res, authenticated = 0;
+     const char *password;
++#endif
++    int res, authenticated = 0;
+     fcgi_request *fr;
+     const fcgi_dir_config * const dir_config =
+         (const fcgi_dir_config *)ap_get_module_config(r->per_dir_config, &fastcgi_module);
+@@ -2668,9 +2677,11 @@
+     if (dir_config->authenticator == NULL)
+         return DECLINED;
+ 
+-    /* Get the user password */
++#ifndef APACHE22
++		/* Get the user password */
+     if ((res = ap_get_basic_auth_pw(r, &password)) != OK)
+         return res;
++#endif /* APACHE22 */
+ 
+     res = create_fcgi_request(r, dir_config->authenticator, &fr);
+     if (res)
+@@ -2704,6 +2715,20 @@
+         goto AuthenticationFailed;
+     }
+ 
++#ifdef APACHE22
++    if (authenticated)
++        return AUTH_GRANTED;
++
++AuthenticationFailed:
++    /* @@@ Probably should support custom_responses */
++    ap_note_basic_auth_failure(r);
++    ap_log_rerror(FCGI_LOG_ERR_NOERRNO, r,
++        "FastCGI: authentication failed for user \"%s\": %s",
++        r->user, r->uri);
++
++		return (res == OK) ? AUTH_DENIED : AUTH_GRANTED;
++
++#else /* !APACHE22 */
+     if (authenticated)
+         return OK;
+ 
+@@ -2722,6 +2747,7 @@
+ #endif
+ 
+         return (res == OK) ? HTTP_UNAUTHORIZED : res;
++#endif /* !APACHE22 */
+ }
+ 
+ static int check_user_authorization(request_rec *r)
+@@ -2913,16 +2939,31 @@
+ 
+ #ifdef APACHE2
+ 
++#ifdef APACHE22
++static const authn_provider authn_fastcgi_provider =
++{
++    &check_user_authentication,
++		NULL,
++};
++#endif /* APACHE22 */
++
++
+ static void register_hooks(apr_pool_t * p)
+ {
+     /* ap_hook_pre_config(x_pre_config, NULL, NULL, APR_HOOK_MIDDLE); */
+     ap_hook_post_config(init_module, NULL, NULL, APR_HOOK_MIDDLE);
+     ap_hook_child_init(fcgi_child_init, NULL, NULL, APR_HOOK_MIDDLE);
+     ap_hook_handler(content_handler, NULL, NULL, APR_HOOK_MIDDLE);
+-    ap_hook_check_user_id(check_user_authentication, NULL, NULL, APR_HOOK_MIDDLE);
+     ap_hook_access_checker(check_access, NULL, NULL, APR_HOOK_MIDDLE);
+     ap_hook_auth_checker(check_user_authorization, NULL, NULL, APR_HOOK_MIDDLE);
+     ap_hook_fixups(fixups, NULL, NULL, APR_HOOK_MIDDLE); 
++#ifdef APACHE22
++		ap_register_provider(p, AUTHN_PROVIDER_GROUP, "fastcgi", "0",
++			 &authn_fastcgi_provider);
++#else
++    ap_hook_check_user_id(check_user_authentication, NULL, NULL, APR_HOOK_MIDDLE);
++#endif
++
+ }
+ 
+ module AP_MODULE_DECLARE_DATA fastcgi_module =

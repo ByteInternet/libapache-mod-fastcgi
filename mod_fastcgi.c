@@ -3,7 +3,7 @@
  *
  *      Apache server module for FastCGI.
  *
- *  $Id: mod_fastcgi.c,v 1.162 2007/11/12 23:00:10 robs Exp $
+ *  $Id: mod_fastcgi.c,v 1.169 2008/11/09 14:31:03 robs Exp $
  *
  *  Copyright (c) 1995-1996 Open Market, Inc.
  *
@@ -647,7 +647,7 @@ static const char *process_headers(request_rec *r, fcgi_request *fr)
 {
     char *p, *next, *name, *value;
     int len, flag;
-    int hasContentType, hasStatus, hasLocation;
+    int hasLocation = FALSE;
 
     ASSERT(fr->parseHeader == SCAN_CGI_READING_HEADERS);
 
@@ -689,7 +689,6 @@ static const char *process_headers(request_rec *r, fcgi_request *fr)
      * Parse all the headers.
      */
     fr->parseHeader = SCAN_CGI_FINISHED;
-    hasContentType = hasStatus = hasLocation = FALSE;
     next = (char *)fr->header->elts;
     for(;;) {
         next = get_header_line(name = next, TRUE);
@@ -718,14 +717,10 @@ static const char *process_headers(request_rec *r, fcgi_request *fr)
         if (strcasecmp(name, "Status") == 0) {
             int statusValue = strtol(value, NULL, 10);
 
-            if (hasStatus) {
-                goto DuplicateNotAllowed;
-            }
             if (statusValue < 0) {
                 fr->parseHeader = SCAN_CGI_BAD_HEADER;
                 return ap_psprintf(r->pool, "invalid Status '%s'", value);
             }
-            hasStatus = TRUE;
             r->status = statusValue;
             r->status_line = ap_pstrdup(r->pool, value);
             continue;
@@ -733,10 +728,6 @@ static const char *process_headers(request_rec *r, fcgi_request *fr)
 
         if (fr->role == FCGI_RESPONDER) {
             if (strcasecmp(name, "Content-type") == 0) {
-                if (hasContentType) {
-                    goto DuplicateNotAllowed;
-                }
-                hasContentType = TRUE;
 #ifdef APACHE2                
                 ap_set_content_type(r, value);
 #else
@@ -744,14 +735,22 @@ static const char *process_headers(request_rec *r, fcgi_request *fr)
 #endif                
                 continue;
             }
+            
+            /* 
+             * Special case headers that should not persist on error 
+             * or across redirects, i.e. use headers_out rather than
+             * err_headers_out.
+             */
 
             if (strcasecmp(name, "Location") == 0) {
-                if (hasLocation) {
-                    goto DuplicateNotAllowed;
-                }
                 hasLocation = TRUE;
-                ap_table_set(r->headers_out, "Location", value);
+                ap_table_set(r->headers_out, name, value);
                 continue;
+            }
+            
+            if (strcasecmp(name, "Content-Length") == 0) {
+                ap_table_set(r->headers_out, name, value);
+            	continue;
             }
 
             /* If the script wants them merged, it can do it */
@@ -841,10 +840,6 @@ BadHeader:
         *p = '\0';
     fr->parseHeader = SCAN_CGI_BAD_HEADER;
     return ap_psprintf(r->pool, "malformed header '%s'", name);
-
-DuplicateNotAllowed:
-    fr->parseHeader = SCAN_CGI_BAD_HEADER;
-    return ap_psprintf(r->pool, "duplicate header '%s'", name);
 }
 
 /*
@@ -1387,8 +1382,11 @@ static int open_connection_to_fs(fcgi_request *fr)
     }
 
     /* Connect */
-    if (connect(fr->fd, (struct sockaddr *)socket_addr, socket_addr_len) == 0)
-        goto ConnectionComplete;
+    do {
+    	if (connect(fr->fd, (struct sockaddr *) socket_addr, socket_addr_len) == 0) {
+    		goto ConnectionComplete;
+    	}
+    } while (errno == EINTR);    
 
 #ifdef WIN32
 
@@ -1432,7 +1430,10 @@ static int open_connection_to_fs(fcgi_request *fr)
             tval.tv_sec = dynamicPleaseStartDelay;
             tval.tv_usec = 0;
 
-            status = ap_select((fr->fd+1), &read_fds, &write_fds, NULL, &tval);
+            do {
+            	status = ap_select(fr->fd + 1, &read_fds, &write_fds, NULL, &tval);
+            } while (status < 0 && errno == EINTR);
+
             if (status < 0)
                 break;
 
@@ -1461,7 +1462,9 @@ static int open_connection_to_fs(fcgi_request *fr)
         FD_SET(fr->fd, &write_fds);
         read_fds = write_fds;
 
-        status = ap_select((fr->fd+1), &read_fds, &write_fds, NULL, &tval);
+        do {
+        	status = ap_select(fr->fd + 1, &read_fds, &write_fds, NULL, &tval);
+        } while (status < 0 && errno == EINTR);
 
         if (status == 0) {
             ap_log_rerror(FCGI_LOG_ERR_NOERRNO, r,
@@ -1762,6 +1765,12 @@ SERVER_SEND:
                 }
 
                 client_send = 0;
+
+                if (fcgi_protocol_dequeue(rp, fr))
+                {
+                    state = STATE_ERROR;
+                    break;
+                }
             }
 
             break;
@@ -2107,6 +2116,12 @@ SERVER_SEND:
                 }
 
                 client_send = 0;
+
+                if (fcgi_protocol_dequeue(rp, fr))
+                {
+                    state = STATE_ERROR;
+                    break;
+                }
             }
 
             break;
@@ -2191,9 +2206,11 @@ SERVER_SEND:
             timeout.tv_sec = idle_timeout;
             timeout.tv_usec = 0;
         }
-
+        
         /* wait on the socket */
-        select_status = ap_select(nfds, &read_set, &write_set, NULL, &timeout);
+        do {
+            select_status = ap_select(nfds, &read_set, &write_set, NULL, &timeout);
+        } while (select_status < 0 && errno == EINTR);
 
         if (select_status < 0)
         {
@@ -2264,13 +2281,29 @@ SERVER_SEND:
 
             if (rv < 0) 
             {
-                ap_log_rerror(FCGI_LOG_ERR, r, "FastCGI: comm with server "
-                    "\"%s\" aborted: read failed", fr->fs_path);
-                state = STATE_ERROR;
-                break;
-            }
+            	if (errno == EAGAIN) 
+            	{
+                    /* this reportedly occurs on AIX 5.2 sporadically */
+                    struct timeval tv;
+                    tv.tv_sec = 1;
+                    tv.tv_usec = 0;
 
-            if (rv == 0) 
+            		ap_log_rerror(FCGI_LOG_INFO, r, "FastCGI: comm with server "
+            				"\"%s\" interrupted: read will be retried in 1 second", 
+            				fr->fs_path);
+            		
+                    /* avoid sleep/alarm interactions */
+                    ap_select(0, NULL, NULL, NULL, &tv);
+            	}
+            	else 
+            	{
+            		ap_log_rerror(FCGI_LOG_ERR, r, "FastCGI: comm with server "
+            				"\"%s\" aborted: read failed", fr->fs_path);
+            		state = STATE_ERROR;
+            		break;
+            	}
+            }
+            else if (rv == 0) 
             {
                 fr->keepReadingFromFcgiApp = FALSE;
                 state = STATE_CLIENT_SEND;
@@ -2582,7 +2615,7 @@ static int apache_is_scriptaliased(request_rec *r)
 static int post_process_for_redirects(request_rec * const r,
     const fcgi_request * const fr)
 {
-    switch(fr->parseHeader) {
+	switch(fr->parseHeader) {
         case SCAN_CGI_INT_REDIRECT:
 
             /* @@@ There are still differences between the handling in
@@ -2603,7 +2636,16 @@ static int post_process_for_redirects(request_rec * const r,
             return HTTP_MOVED_TEMPORARILY;
 
         default:
-            return OK;
+#ifdef APACHE2        	
+	        {
+	        	apr_bucket_brigade *brigade = apr_brigade_create(r->pool, r->connection->bucket_alloc);
+	        	apr_bucket* bucket = apr_bucket_eos_create(r->connection->bucket_alloc);
+	        	APR_BRIGADE_INSERT_HEAD(brigade, bucket);
+	        	return ap_pass_brigade(r->output_filters, brigade); 
+	        }
+#else 
+	        return OK;
+#endif
     }
 }
 

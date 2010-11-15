@@ -1,5 +1,5 @@
 /*
- * $Id: fcgi.h,v 1.47 2007/09/23 16:33:29 robs Exp $
+ * $Id: fcgi.h,v 1.48 2008/09/22 10:36:06 robs Exp $
  */
 
 #ifndef FCGI_H
@@ -81,6 +81,7 @@ typedef apr_status_t apcb_t;
 #define ap_copy_table apr_table_copy
 #define ap_cpystrn apr_cpystrn
 #define ap_destroy_pool apr_pool_destroy
+#define ap_isalnum apr_isalnum
 #define ap_isspace apr_isspace
 #define ap_make_array apr_array_make
 #define ap_make_table apr_table_make
@@ -100,6 +101,7 @@ typedef apr_status_t apcb_t;
 #define ap_table_set apr_table_set
 #define ap_table_setn apr_table_setn
 #define ap_table_unset apr_table_unset
+#define ap_toupper apr_toupper
 
 #endif /* defined(ap_copy_table) */
 

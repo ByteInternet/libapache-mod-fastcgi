@@ -1,3 +1,9 @@
+libapache-mod-fastcgi (2.4.7~0910052141-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Tatsuki Sugiura <sugi@nemui.org>  Mon, 15 Nov 2010 16:31:58 +0900
+
 libapache-mod-fastcgi (2.4.6-1) unstable; urgency=low
 
   * New upstream release

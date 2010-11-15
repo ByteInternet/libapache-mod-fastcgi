@@ -1,5 +1,5 @@
 /*
- * $Id: fcgi_protocol.c,v 1.25 2003/02/03 22:59:01 robs Exp $
+ * $Id: fcgi_protocol.c,v 1.27 2008/09/23 14:48:13 robs Exp $
  */
 
 #include "fcgi.h"
@@ -169,6 +169,32 @@ static void add_auth_cgi_vars(request_rec *r, const int compat)
     }
 }
 
+/* copied from util_script.c */
+static char *http2env(pool *a, const char *w)
+{
+    char *res = (char *) ap_palloc(a, sizeof("HTTP_") + strlen(w));
+    char *cp = res;
+    char c;
+
+    *cp++ = 'H';
+    *cp++ = 'T';
+    *cp++ = 'T';
+    *cp++ = 'P';
+    *cp++ = '_';
+
+    while ((c = *w++) != 0) {
+        if (!ap_isalnum(c)) {
+            *cp++ = '_';
+        }
+        else {
+            *cp++ = (char) ap_toupper(c);
+        }
+    }
+    *cp = 0;
+
+    return res;
+}
+
 static void add_pass_header_vars(fcgi_request *fr)
 {
     const array_header *ph = fr->dynamic ? dynamic_pass_headers : fr->fs->pass_headers;
@@ -180,7 +206,11 @@ static void add_pass_header_vars(fcgi_request *fr)
         for ( ; i; --i, ++elt) {
             const char *val = ap_table_get(fr->r->headers_in, *elt);
             if (val) {
-                ap_table_setn(fr->r->subprocess_env, *elt, val);
+            	const char *key = *elt;
+#ifndef USE_BROKEN_PASS_HEADER
+            	key = http2env(fr->r->pool, key);
+#endif            	
+                ap_table_setn(fr->r->subprocess_env, key, val);
             }
         }
     }

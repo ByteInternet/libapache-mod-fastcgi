@@ -1,0 +1,35 @@
+This package uses CDBS (and therefore simple-patchsys.mk) in order to 
+apply patches to the upstream source. Patches are stored in 
+debian/patches and their filenames usually end in .patch or .diff .
+For further details, see the man page for cdbs-edit-patch.
+
+All commands described below should be run from the top directory of the 
+package source tree, unless otherwise stated.
+
+ * To generate the fully patched source, in a form ready for
+   editing, that would be built to create Debian packages, run: 
+
+     make -f debian/rules apply-patches
+
+   Note: It has been proposed that, in future, this should happen 
+   automatically when you run dpkg-source -x on a CDBS 
+   simple-patchsys.mk source package.  However, this proposal has 
+   apparently not yet been implemented, so for now you have to do 
+   it yourself like this.
+
+ * To modify the source and save those modifications so that
+   they will be applied when building the package, pick a
+   suitably informative patch file name, for example
+   01_add_README.source_file.patch, and then run:
+
+     cdbs-edit-patch 01_add_README.source_file.patch
+
+   This will place you in a new shell in a temporary copy of the 
+   source tree.  Make your desired modifications to it, and then 
+   exit the shell to create the patch file containing them (this 
+   file will appear in debian/patches).
+
+ * To remove source modifications that are currently being
+   applied when building the package, run:
+
+     make -f debian/rules reverse-patches

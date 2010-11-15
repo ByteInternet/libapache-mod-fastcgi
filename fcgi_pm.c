@@ -1,5 +1,5 @@
 /*
- * $Id: fcgi_pm.c,v 1.93 2004/04/15 02:01:26 robs Exp $
+ * $Id: fcgi_pm.c,v 1.96 2009/09/29 00:34:10 robs Exp $
  */
 
 
@@ -32,6 +32,7 @@ static time_t now = 0;
 #ifdef WIN32
 #ifdef APACHE2
 #include "mod_cgi.h"
+#include "apr_version.h"
 #endif
 #pragma warning ( disable : 4100 4102 )
 static BOOL bTimeToDie = FALSE;  /* process termination flag */
@@ -128,19 +129,6 @@ static void shutdown_all()
         int numChildren = (s->directive == APP_CLASS_DYNAMIC)
             ? dynamicMaxClassProcs
             : s->numProcesses;
-        
-#ifndef WIN32
-        if (s->socket_path != NULL && s->directive != APP_CLASS_EXTERNAL) 
-        {
-            /* Remove the socket file */
-            if (unlink(s->socket_path) != 0 && errno != ENOENT) {
-                ap_log_error(FCGI_LOG_ERR, fcgi_apache_main_server,
-                    "FastCGI: unlink() failed to remove socket file \"%s\" for%s server \"%s\"",
-                    s->socket_path,
-                    (s->directive == APP_CLASS_DYNAMIC) ? " (dynamic)" : "", s->fs_path);
-            }
-        }
-#endif
 
         /* Send TERM to all processes */
         for (i = 0; i < numChildren; i++, proc++) 
@@ -150,9 +138,47 @@ static void shutdown_all()
                 fcgi_kill(proc, SIGTERM);
             }
         }
-        
+
         s = s->next;
     }
+
+#ifndef WIN32
+    
+    s = fcgi_servers;
+    while (s) 
+    {
+    	if (s->socket_path != NULL && s->directive != APP_CLASS_EXTERNAL) 
+    	{
+    	    struct timeval tv;
+    	    
+    	    /* sleep two seconds to let the children terminate themselves */
+    	    tv.tv_sec = 2;
+    	    tv.tv_usec = 0;
+    	    ap_select(0, NULL, NULL, NULL, &tv);
+    	    
+    	    while (s) 
+    	    {
+    	        if (s->socket_path != NULL && s->directive != APP_CLASS_EXTERNAL) 
+    	        {
+    	            /* Remove the socket file */
+    	            if (unlink(s->socket_path) != 0 && errno != ENOENT) {
+    	                ap_log_error(FCGI_LOG_ERR, fcgi_apache_main_server,
+    	                    "FastCGI: unlink() failed to remove socket file \"%s\" for%s server \"%s\"",
+    	                    s->socket_path,
+    	                    (s->directive == APP_CLASS_DYNAMIC) ? " (dynamic)" : "", s->fs_path);
+    	            }
+    	        }
+    	        
+    	        s = s->next;
+    	    }
+    	    
+    	    break;
+    	}
+    	
+    	s = s->next;
+    }
+    
+#endif
 
 #if defined(WIN32) && (WIN32_SHUTDOWN_GRACEFUL_WAIT > 0)
 
@@ -559,6 +585,11 @@ FailedSystemCallExit:
     if (apr_os_file_put(&file, &listen_handle, 0, tp))
         goto CLEANUP;
 
+#if (APR_MAJOR_VERSION >= 1) && (APR_MINOR_VERSION >= 3)
+    if (apr_procattr_io_set(procattr, APR_FULL_BLOCK, APR_NO_FILE, APR_NO_FILE))
+        goto CLEANUP;
+#endif    
+    
     /* procattr is opaque so we have to use this - unfortuantely it dups */
     if (apr_procattr_child_in_set(procattr, file, NULL))
         goto CLEANUP; 

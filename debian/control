@@ -2,13 +2,14 @@ Source: libapache-mod-fastcgi
 Section: non-free/web
 Priority: optional
 Maintainer: Tatsuki Sugiura <sugi@nemui.org>
-Standards-Version: 3.7.3
-Build-Depends: debhelper (>> 3.0.0), cdbs, apache2-threaded-dev (>= 2.2.4) | apache2-prefork-dev (>= 2.2.4), dpatch (>= 2.0.0), libtool, libapr1-dev, pkg-config
+Standards-Version: 3.9.1
+Build-Depends: debhelper (>> 5.0.0), cdbs, apache2-threaded-dev (>= 2.2.4) | apache2-prefork-dev (>= 2.2.4), dpatch (>= 2.0.0), libtool, libapr1-dev, pkg-config
 Uploaders: Taku YASUI <tach@debian.or.jp>
+Homepage: http://www.fastcgi.com/
 
 Package: libapache2-mod-fastcgi
 Architecture: any
-Depends: apache2.2-common (>= 2.2.4), ${shlibs:Depends}
+Depends: apache2.2-common (>= 2.2.4), ${shlibs:Depends}, ${misc:Depends}
 Description: Apache 2 FastCGI module for long-running CGI scripts
  This is a FastCGI module for the Apache 2.x web server.  FastCGI is an
  open standard for communicating between a web server and a long-running

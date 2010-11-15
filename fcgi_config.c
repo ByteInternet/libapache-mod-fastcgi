@@ -1,5 +1,5 @@
 /*
- * $Id: fcgi_config.c,v 1.53 2007/10/29 00:22:00 robs Exp $
+ * $Id: fcgi_config.c,v 1.54 2009/09/28 12:33:14 robs Exp $
  */
 
 #define CORE_PRIVATE
@@ -766,12 +766,12 @@ const char *fcgi_config_new_static_server(cmd_parms *cmd, void *dummy, const cha
     {
         if (s->group == NULL)
         {
-            s->group = ap_psprintf(tp, "#%ld", fcgi_util_get_server_gid(cmd->server));
+            s->group = ap_psprintf(tp, "#%ld", (long) fcgi_util_get_server_gid(cmd->server));
         }
 
         if (s->user == NULL)
         {
-            s->user = ap_psprintf(p, "#%ld", fcgi_util_get_server_uid(cmd->server)); 
+            s->user = ap_psprintf(p, "#%ld", (long) fcgi_util_get_server_uid(cmd->server)); 
         }
 
         s->uid = ap_uname2id(s->user);
@@ -959,12 +959,12 @@ const char *fcgi_config_new_external_server(cmd_parms *cmd, void *dummy, const c
     {
         if (s->group == NULL)
         {
-            s->group = ap_psprintf(tp, "#%ld", fcgi_util_get_server_gid(cmd->server));
+            s->group = ap_psprintf(tp, "#%ld", (long) fcgi_util_get_server_gid(cmd->server));
         }
 
         if (s->user == NULL)
         {
-            s->user = ap_psprintf(p, "#%ld", fcgi_util_get_server_uid(cmd->server));
+            s->user = ap_psprintf(p, "#%ld", (long) fcgi_util_get_server_uid(cmd->server));
         }
 
         s->uid = ap_uname2id(s->user);

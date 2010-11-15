@@ -1,3 +1,36 @@
+2.4.7
+
+ *) *nix: On graceful restart, send SIGTERM, then wait 2sec before 
+    removing any unix domain sockets.  Based on a patch by Bernd Wurst.
+ 
+ *) Fix uid_t/gid_t compiler warnings.  [Artur Zaprzala <arturz ownmail.net>]
+
+ *) A few more EINTR fixes. [Artur Zaprzala <arturz ownmail.net>]
+
+ *) Don't let the Content-Length header propagate on errors or across
+    redirects.  [Artur Zaprzala <arturz ownmail.net>]
+
+ *) Fix pass-header handling (prefix with HTTP_).  Based on a patch by 
+    [Christian Seiler <chris_se gmx.net>]
+
+ *) Add an EOS bucket to the output filter chain.  Based on a patch by
+    [Philipp Dunkel <p.dunkel i5invest.com>]
+    
+ *) Handle EINTR and EAGAIN in places AIX stress testing revealed 
+    issues.  Based on a patch by [Rainer Jung <rainer.jung kippdata.de>]
+
+ *) Fix process spawning on WIN under Apache 2.2.9 (an incompatible
+    change was introduced in APR 1.3).  Patch by 
+    [Tom Donovan <Tom tomdonovan.net>]
+
+ *) Allow duplicate Status, Location and ContentType headers
+    (consistent with mod_cgi).  Based on a patch by 
+    [Christian Seiler <chris_se gmx.net>]
+
+ *) Fix a spurious idle timeout error that occurred under unique 
+    application timing and response size conditions.  Based on a 
+    report and patch by [Joe Strout <joe strout.net>]
+
 2.4.6
 
  *) Fix a bug I introduced in 2.4.4 that broke dynamic application

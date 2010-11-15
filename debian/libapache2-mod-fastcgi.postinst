@@ -27,7 +27,7 @@ case "$1" in
     configure)
 	test ! -e /etc/apache2/mods-enabled/fcgid.load \
 	  -a ! -e /etc/apache2/mods-enabled/fastcgi.load \
-	  && /usr/sbin/a2enmod fastcgi
+	  && a2enmod fastcgi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

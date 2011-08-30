@@ -1,3 +1,12 @@
+libapache-mod-fastcgi (2.4.6-1byte1) unstable; urgency=low
+
+  * Versie 1 van migratie naar quilt vanaf dpatch
+  * Ignore things after building. Compat level +3
+  * Simply skip duplicate headers instead of croaking
+  * Fix compile warnings
+
+ -- Allard Hoeve <allard@byte.nl>  Tue, 30 Aug 2011 16:33:08 +0200
+
 libapache-mod-fastcgi (2.4.6-1) unstable; urgency=low
 
   * New upstream release

@@ -1,2 +1,3 @@
 doc-misc-typo-fix.diff
 simply-skip-duplicate-headers.diff
+fix-compile-warnings-about-gid_t.diff

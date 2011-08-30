@@ -3,7 +3,6 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/langcore.mk
 include /usr/share/cdbs/1/class/makefile-vars.mk
-include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 
 APACHE2_VERSION=`dpkg -s apache2-prefork-dev apache2-threaded-dev 2>/dev/null |grep Version: | awk '{print $$2}'`
 

@@ -1,3 +1,9 @@
+libapache-mod-fastcgi (2.4.6-1byte2) unstable; urgency=low
+
+  * Use 3.0 source format to escew quilt.
+
+ -- Allard Hoeve <allard@byte.nl>  Tue, 30 Aug 2011 16:35:23 +0200
+
 libapache-mod-fastcgi (2.4.6-1byte1) unstable; urgency=low
 
   * Versie 1 van migratie naar quilt vanaf dpatch

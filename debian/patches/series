@@ -1,4 +1,4 @@
 doc-misc-typo-fix.diff
-simply-skip-duplicate-headers.diff
-fix-compile-warnings-about-gid_t.diff
-new_packet_type_byte_acc.diff
+byte-simply-skip-duplicate-headers.diff
+byte-fix-compile-warnings-about-gid_t.diff
+byte-new-packet-type-byte_acc.diff

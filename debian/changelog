@@ -3,12 +3,15 @@ libapache-mod-fastcgi (2.4.7~0910052141-1) unstable; urgency=low
   * New upstream release
 
  -- Tatsuki Sugiura <sugi@nemui.org>  Mon, 15 Nov 2010 16:31:58 +0900
+=======
 
-libapache-mod-fastcgi (2.4.6-1byte2) unstable; urgency=low
+libapache-mod-fastcgi (2.4.6-1byte3) UNRELEASED; urgency=low
 
-  * Use 3.0 source format to escew quilt.
+  * Define a new packet type BYTE_ACC
+  * Rename patches naar goede namen met byte- prefix
+  * Handle Byte Accounting packets and save request notes
 
- -- Allard Hoeve <allard@byte.nl>  Tue, 30 Aug 2011 16:35:23 +0200
+ -- Allard Hoeve <allard@byte.nl>  Fri, 02 Sep 2011 17:07:02 +0200
 
 libapache-mod-fastcgi (2.4.6-1byte1) unstable; urgency=low
 

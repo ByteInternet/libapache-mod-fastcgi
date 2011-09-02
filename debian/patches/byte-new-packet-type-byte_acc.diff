@@ -1,7 +1,7 @@
 Index: libapache-mod-fastcgi/fcgi_protocol.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi_protocol.h	2011-09-01 16:46:57.659269391 +0200
-+++ libapache-mod-fastcgi/fcgi_protocol.h	2011-09-01 16:48:37.052794371 +0200
+--- libapache-mod-fastcgi.orig/fcgi_protocol.h	2011-09-02 12:37:00.457438778 +0200
++++ libapache-mod-fastcgi/fcgi_protocol.h	2011-09-02 13:01:30.555785378 +0200
 @@ -52,7 +52,8 @@
  #define FCGI_DATA                8
  #define FCGI_GET_VALUES          9
@@ -12,16 +12,200 @@ Index: libapache-mod-fastcgi/fcgi_protocol.h
  #define FCGI_MAXTYPE (FCGI_UNKNOWN_TYPE)
  
  /*
+@@ -108,6 +109,50 @@
+ #define FCGI_OVERLOADED       2
+ #define FCGI_UNKNOWN_ROLE     3
+ 
++/*
++ * Byte - AAH - define Byte data structures for BSD accounting
++ */
++
++typedef struct {
++    unsigned char ownSystemTimeB7;
++    unsigned char ownSystemTimeB6;
++    unsigned char ownSystemTimeB5;
++    unsigned char ownSystemTimeB4;
++    unsigned char ownSystemTimeB3;
++    unsigned char ownSystemTimeB2;
++    unsigned char ownSystemTimeB1;
++    unsigned char ownSystemTimeB0;
++
++    unsigned char ownUserTimeB7;
++    unsigned char ownUserTimeB6;
++    unsigned char ownUserTimeB5;
++    unsigned char ownUserTimeB4;
++    unsigned char ownUserTimeB3;
++    unsigned char ownUserTimeB2;
++    unsigned char ownUserTimeB1;
++    unsigned char ownUserTimeB0;
++
++    unsigned char childSystemTimeB7;
++    unsigned char childSystemTimeB6;
++    unsigned char childSystemTimeB5;
++    unsigned char childSystemTimeB4;
++    unsigned char childSystemTimeB3;
++    unsigned char childSystemTimeB2;
++    unsigned char childSystemTimeB1;
++    unsigned char childSystemTimeB0;
++
++    unsigned char childUserTimeB7;
++    unsigned char childUserTimeB6;
++    unsigned char childUserTimeB5;
++    unsigned char childUserTimeB4;
++    unsigned char childUserTimeB3;
++    unsigned char childUserTimeB2;
++    unsigned char childUserTimeB1;
++    unsigned char childUserTimeB0;
++
++    unsigned char reserved[8];
++} FCGI_ByteAccBody;
++
+ 
+ /*
+  * Variable names for FCGI_GET_VALUES / FCGI_GET_VALUES_RESULT records
 Index: libapache-mod-fastcgi/fcgi_protocol.c
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi_protocol.c	2011-09-01 16:48:43.719810672 +0200
-+++ libapache-mod-fastcgi/fcgi_protocol.c	2011-09-01 16:49:21.150740683 +0200
-@@ -478,6 +478,8 @@
+--- libapache-mod-fastcgi.orig/fcgi_protocol.c	2011-09-02 12:37:00.433803504 +0200
++++ libapache-mod-fastcgi/fcgi_protocol.c	2011-09-02 17:02:58.454053370 +0200
+@@ -445,8 +445,8 @@
+                         ap_log_rerror(FCGI_LOG_ERR_NOERRNO, fr->r,
+                             "FastCGI: comm with server \"%s\" aborted: protocol error: "
+                             "invalid FCGI_END_REQUEST size: "
+-                            "%d != sizeof(FCGI_EndRequestBody)(%d)",
+-                            fr->fs_path, fr->dataLen, sizeof(FCGI_EndRequestBody));
++                            "%d != sizeof(FCGI_EndRequestBody)(%ld)",
++                            fr->fs_path, fr->dataLen, (unsigned long) sizeof(FCGI_EndRequestBody));
+                         return HTTP_INTERNAL_SERVER_ERROR;
+                     }
+                     fr->readingEndRequestBody = TRUE;
+@@ -478,6 +478,92 @@
                      fr->readingEndRequestBody = FALSE;
                  }
                  break;
 +	    case FCGI_BYTE_ACC:
-+		/* XXX coming soon */
++		/* Look in our state variable if we are already reading the request
++		   NB that this is a multiplexed protocol, so the request might span
++		   multiple packets. Therefore we read and if that is all, save times */
++
++                if (!fr->readingByteAccBody) {
++                    if (fr->dataLen != sizeof(FCGI_ByteAccBody)) {
++                        ap_log_rerror(FCGI_LOG_ERR_NOERRNO, fr->r,
++                            "FastCGI: comm with server \"%s\" aborted: protocol error: "
++                            "invalid FCGI_BYTE_ACC size: "
++                            "%d != sizeof(FCGI_EndRequestBody)(%ld)",
++                            fr->fs_path, fr->dataLen, (unsigned long) sizeof(FCGI_ByteAccBody));
++
++                        return HTTP_INTERNAL_SERVER_ERROR;
++                    }
++                    fr->readingByteAccBody = TRUE;
++                }
++
++		/* Check to see if there is still content left to read. If so, read it */
++                if (len>0) {
++                    fcgi_buf_get_to_buf(fr->byteAccBufPtr, fr->serverInputBuffer, len);
++                    fr->dataLen -= len;
++                }
++
++		/* If all data is exhausted, save all usage info */
++                if (fr->dataLen == 0) {
++                    FCGI_ByteAccBody *byteAccBody = &fr->byteAccBody;
++                    fcgi_buf_get_to_block(
++                        fr->byteAccBufPtr, (char *) &fr->byteAccBody,
++                        sizeof(FCGI_ByteAccBody));
++
++			/* Calculate the times. Bitshift the simple 8-bit values into a 64-bit unsigned long)
++			     We cast the 8-bit chars to unsigned long first, otherwise gcc will complain */
++
++			fr->utime = 	  ((unsigned long) (byteAccBody->ownUserTimeB7 & 0xff) << 8 * 7) 
++				 	+ ((unsigned long) (byteAccBody->ownUserTimeB6 & 0xff) << 8 * 6)
++				 	+ ((unsigned long) (byteAccBody->ownUserTimeB5 & 0xff) << 8 * 5)
++				 	+ ((unsigned long) (byteAccBody->ownUserTimeB4 & 0xff) << 8 * 4)
++				 	+ ((unsigned long) (byteAccBody->ownUserTimeB3 & 0xff) << 8 * 3)
++				 	+ ((unsigned long) (byteAccBody->ownUserTimeB2 & 0xff) << 8 * 2)
++			                + ((unsigned long) (byteAccBody->ownUserTimeB1 & 0xff) << 8 * 1)
++					+ ((unsigned long) (byteAccBody->ownUserTimeB0 & 0xff) << 8 * 0);
++
++			fr->stime = 	  ((unsigned long) (byteAccBody->ownSystemTimeB7 & 0xff) << 8 * 7) 
++				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB6 & 0xff) << 8 * 6)
++				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB5 & 0xff) << 8 * 5)
++				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB4 & 0xff) << 8 * 4)
++				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB3 & 0xff) << 8 * 3)
++				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB2 & 0xff) << 8 * 2)
++			                + ((unsigned long) (byteAccBody->ownSystemTimeB1 & 0xff) << 8 * 1)
++					+ ((unsigned long) (byteAccBody->ownSystemTimeB0 & 0xff) << 8 * 0);
++
++			fr->cutime = 	  ((unsigned long) (byteAccBody->childUserTimeB7 & 0xff) << 8 * 7) 
++				 	+ ((unsigned long) (byteAccBody->childUserTimeB6 & 0xff) << 8 * 6)
++				 	+ ((unsigned long) (byteAccBody->childUserTimeB5 & 0xff) << 8 * 5)
++				 	+ ((unsigned long) (byteAccBody->childUserTimeB4 & 0xff) << 8 * 4)
++				 	+ ((unsigned long) (byteAccBody->childUserTimeB3 & 0xff) << 8 * 3)
++				 	+ ((unsigned long) (byteAccBody->childUserTimeB2 & 0xff) << 8 * 2)
++			                + ((unsigned long) (byteAccBody->childUserTimeB1 & 0xff) << 8 * 1)
++					+ ((unsigned long) (byteAccBody->childUserTimeB0 & 0xff) << 8 * 0);
++
++			fr->cstime = 	  ((unsigned long) (byteAccBody->childSystemTimeB7 & 0xff) << 8 * 7) 
++				 	+ ((unsigned long) (byteAccBody->childSystemTimeB6 & 0xff) << 8 * 6)
++				 	+ ((unsigned long) (byteAccBody->childSystemTimeB5 & 0xff) << 8 * 5)
++				 	+ ((unsigned long) (byteAccBody->childSystemTimeB4 & 0xff) << 8 * 4)
++				 	+ ((unsigned long) (byteAccBody->childSystemTimeB3 & 0xff) << 8 * 3)
++				 	+ ((unsigned long) (byteAccBody->childSystemTimeB2 & 0xff) << 8 * 2)
++			                + ((unsigned long) (byteAccBody->childSystemTimeB1 & 0xff) << 8 * 1)
++					+ ((unsigned long) (byteAccBody->childSystemTimeB0 & 0xff) << 8 * 0);
++
++		    ap_log_rerror(FCGI_LOG_NOTICE_NOERRNO, fr->r,
++			"FastCGI: Byte packet processed: utime is %ld, stime is %ld, cutime is %ld, cstime = %ld", fr->utime, fr->stime, fr->cutime, fr->cstime);
++
++		    /* Set the request notes so we can print the rusage with mod_log through environment variables */
++		    request_rec *last = fr->r;
++                    while (last->next)
++			last = last->next; // find the last request, we insert notes there
++
++		    apr_table_setn(last->notes, "ACC_utime", apr_psprintf(last->pool,  "%ld", fr->utime));
++		    apr_table_setn(last->notes, "ACC_stime", apr_psprintf(last->pool,  "%ld", fr->stime));
++		    apr_table_setn(last->notes, "ACC_cutime", apr_psprintf(last->pool, "%ld", fr->cutime));
++		    apr_table_setn(last->notes, "ACC_cstime", apr_psprintf(last->pool, "%ld", fr->cstime));
++
++                    fr->readingByteAccBody = FALSE;
++                }
++		break;
              case FCGI_GET_VALUES_RESULT:
                  /* XXX coming soon */
              case FCGI_UNKNOWN_TYPE:
+Index: libapache-mod-fastcgi/fcgi.h
+===================================================================
+--- libapache-mod-fastcgi.orig/fcgi.h	2011-09-02 12:39:38.496788812 +0200
++++ libapache-mod-fastcgi/fcgi.h	2011-09-02 12:54:23.032252248 +0200
+@@ -298,6 +298,17 @@
+     Buffer *erBufPtr;
+     int exitStatus;
+     int exitStatusSet;
++
++    /* Byte - AAH */
++    FCGI_ByteAccBody byteAccBody;
++    Buffer *byteAccBufPtr;
++    int readingByteAccBody;
++    uint64_t utime;
++    uint64_t stime;
++    uint64_t cutime;
++    uint64_t cstime;
++    /* End Byte - AAH */
++
+     unsigned int requestId;
+     int eofSent;
+     int role;                       /* FastCGI Role: Authorizer or Responder */
+Index: libapache-mod-fastcgi/mod_fastcgi.c
+===================================================================
+--- libapache-mod-fastcgi.orig/mod_fastcgi.c	2011-09-02 12:37:48.071186053 +0200
++++ libapache-mod-fastcgi/mod_fastcgi.c	2011-09-02 12:54:36.775525553 +0200
+@@ -2539,6 +2539,11 @@
+ #endif    
+ 	}
+ 
++    /* Byte AAH */
++    fr->byteAccBufPtr = fcgi_buf_new(p, sizeof(FCGI_ByteAccBody) + 1);
++    fr->readingByteAccBody = 1;
++    /* End Byte AAH */
++
+     set_uid_n_gid(r, &fr->user, &fr->group);
+ 
+     *frP = fr;

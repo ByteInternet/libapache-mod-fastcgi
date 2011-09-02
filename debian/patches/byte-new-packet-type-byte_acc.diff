@@ -1,7 +1,7 @@
 Index: libapache-mod-fastcgi/fcgi_protocol.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi_protocol.h	2011-09-02 12:37:00.457438778 +0200
-+++ libapache-mod-fastcgi/fcgi_protocol.h	2011-09-02 13:01:30.555785378 +0200
+--- libapache-mod-fastcgi.orig/fcgi_protocol.h	2011-09-02 17:18:19.568226379 +0200
++++ libapache-mod-fastcgi/fcgi_protocol.h	2011-09-02 17:22:09.353961455 +0200
 @@ -52,7 +52,8 @@
  #define FCGI_DATA                8
  #define FCGI_GET_VALUES          9
@@ -65,8 +65,8 @@ Index: libapache-mod-fastcgi/fcgi_protocol.h
   * Variable names for FCGI_GET_VALUES / FCGI_GET_VALUES_RESULT records
 Index: libapache-mod-fastcgi/fcgi_protocol.c
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi_protocol.c	2011-09-02 12:37:00.433803504 +0200
-+++ libapache-mod-fastcgi/fcgi_protocol.c	2011-09-02 17:02:58.454053370 +0200
+--- libapache-mod-fastcgi.orig/fcgi_protocol.c	2011-09-02 17:18:19.528010849 +0200
++++ libapache-mod-fastcgi/fcgi_protocol.c	2011-09-02 17:22:50.051259936 +0200
 @@ -445,8 +445,8 @@
                          ap_log_rerror(FCGI_LOG_ERR_NOERRNO, fr->r,
                              "FastCGI: comm with server \"%s\" aborted: protocol error: "
@@ -116,54 +116,54 @@ Index: libapache-mod-fastcgi/fcgi_protocol.c
 +			/* Calculate the times. Bitshift the simple 8-bit values into a 64-bit unsigned long)
 +			     We cast the 8-bit chars to unsigned long first, otherwise gcc will complain */
 +
-+			fr->utime = 	  ((unsigned long) (byteAccBody->ownUserTimeB7 & 0xff) << 8 * 7) 
-+				 	+ ((unsigned long) (byteAccBody->ownUserTimeB6 & 0xff) << 8 * 6)
-+				 	+ ((unsigned long) (byteAccBody->ownUserTimeB5 & 0xff) << 8 * 5)
-+				 	+ ((unsigned long) (byteAccBody->ownUserTimeB4 & 0xff) << 8 * 4)
-+				 	+ ((unsigned long) (byteAccBody->ownUserTimeB3 & 0xff) << 8 * 3)
-+				 	+ ((unsigned long) (byteAccBody->ownUserTimeB2 & 0xff) << 8 * 2)
-+			                + ((unsigned long) (byteAccBody->ownUserTimeB1 & 0xff) << 8 * 1)
-+					+ ((unsigned long) (byteAccBody->ownUserTimeB0 & 0xff) << 8 * 0);
++			fr->utime = 	  ((uint64_t) (byteAccBody->ownUserTimeB7 & 0xff) << 8 * 7) 
++				 	+ ((uint64_t) (byteAccBody->ownUserTimeB6 & 0xff) << 8 * 6)
++				 	+ ((uint64_t) (byteAccBody->ownUserTimeB5 & 0xff) << 8 * 5)
++				 	+ ((uint64_t) (byteAccBody->ownUserTimeB4 & 0xff) << 8 * 4)
++				 	+ ((uint64_t) (byteAccBody->ownUserTimeB3 & 0xff) << 8 * 3)
++				 	+ ((uint64_t) (byteAccBody->ownUserTimeB2 & 0xff) << 8 * 2)
++			                + ((uint64_t) (byteAccBody->ownUserTimeB1 & 0xff) << 8 * 1)
++					+ ((uint64_t) (byteAccBody->ownUserTimeB0 & 0xff) << 8 * 0);
 +
-+			fr->stime = 	  ((unsigned long) (byteAccBody->ownSystemTimeB7 & 0xff) << 8 * 7) 
-+				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB6 & 0xff) << 8 * 6)
-+				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB5 & 0xff) << 8 * 5)
-+				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB4 & 0xff) << 8 * 4)
-+				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB3 & 0xff) << 8 * 3)
-+				 	+ ((unsigned long) (byteAccBody->ownSystemTimeB2 & 0xff) << 8 * 2)
-+			                + ((unsigned long) (byteAccBody->ownSystemTimeB1 & 0xff) << 8 * 1)
-+					+ ((unsigned long) (byteAccBody->ownSystemTimeB0 & 0xff) << 8 * 0);
++			fr->stime = 	  ((uint64_t) (byteAccBody->ownSystemTimeB7 & 0xff) << 8 * 7) 
++				 	+ ((uint64_t) (byteAccBody->ownSystemTimeB6 & 0xff) << 8 * 6)
++				 	+ ((uint64_t) (byteAccBody->ownSystemTimeB5 & 0xff) << 8 * 5)
++				 	+ ((uint64_t) (byteAccBody->ownSystemTimeB4 & 0xff) << 8 * 4)
++				 	+ ((uint64_t) (byteAccBody->ownSystemTimeB3 & 0xff) << 8 * 3)
++				 	+ ((uint64_t) (byteAccBody->ownSystemTimeB2 & 0xff) << 8 * 2)
++			                + ((uint64_t) (byteAccBody->ownSystemTimeB1 & 0xff) << 8 * 1)
++					+ ((uint64_t) (byteAccBody->ownSystemTimeB0 & 0xff) << 8 * 0);
 +
-+			fr->cutime = 	  ((unsigned long) (byteAccBody->childUserTimeB7 & 0xff) << 8 * 7) 
-+				 	+ ((unsigned long) (byteAccBody->childUserTimeB6 & 0xff) << 8 * 6)
-+				 	+ ((unsigned long) (byteAccBody->childUserTimeB5 & 0xff) << 8 * 5)
-+				 	+ ((unsigned long) (byteAccBody->childUserTimeB4 & 0xff) << 8 * 4)
-+				 	+ ((unsigned long) (byteAccBody->childUserTimeB3 & 0xff) << 8 * 3)
-+				 	+ ((unsigned long) (byteAccBody->childUserTimeB2 & 0xff) << 8 * 2)
-+			                + ((unsigned long) (byteAccBody->childUserTimeB1 & 0xff) << 8 * 1)
-+					+ ((unsigned long) (byteAccBody->childUserTimeB0 & 0xff) << 8 * 0);
++			fr->cutime = 	  ((uint64_t) (byteAccBody->childUserTimeB7 & 0xff) << 8 * 7) 
++				 	+ ((uint64_t) (byteAccBody->childUserTimeB6 & 0xff) << 8 * 6)
++				 	+ ((uint64_t) (byteAccBody->childUserTimeB5 & 0xff) << 8 * 5)
++				 	+ ((uint64_t) (byteAccBody->childUserTimeB4 & 0xff) << 8 * 4)
++				 	+ ((uint64_t) (byteAccBody->childUserTimeB3 & 0xff) << 8 * 3)
++				 	+ ((uint64_t) (byteAccBody->childUserTimeB2 & 0xff) << 8 * 2)
++			                + ((uint64_t) (byteAccBody->childUserTimeB1 & 0xff) << 8 * 1)
++					+ ((uint64_t) (byteAccBody->childUserTimeB0 & 0xff) << 8 * 0);
 +
-+			fr->cstime = 	  ((unsigned long) (byteAccBody->childSystemTimeB7 & 0xff) << 8 * 7) 
-+				 	+ ((unsigned long) (byteAccBody->childSystemTimeB6 & 0xff) << 8 * 6)
-+				 	+ ((unsigned long) (byteAccBody->childSystemTimeB5 & 0xff) << 8 * 5)
-+				 	+ ((unsigned long) (byteAccBody->childSystemTimeB4 & 0xff) << 8 * 4)
-+				 	+ ((unsigned long) (byteAccBody->childSystemTimeB3 & 0xff) << 8 * 3)
-+				 	+ ((unsigned long) (byteAccBody->childSystemTimeB2 & 0xff) << 8 * 2)
-+			                + ((unsigned long) (byteAccBody->childSystemTimeB1 & 0xff) << 8 * 1)
-+					+ ((unsigned long) (byteAccBody->childSystemTimeB0 & 0xff) << 8 * 0);
++			fr->cstime = 	  ((uint64_t) (byteAccBody->childSystemTimeB7 & 0xff) << 8 * 7) 
++				 	+ ((uint64_t) (byteAccBody->childSystemTimeB6 & 0xff) << 8 * 6)
++				 	+ ((uint64_t) (byteAccBody->childSystemTimeB5 & 0xff) << 8 * 5)
++				 	+ ((uint64_t) (byteAccBody->childSystemTimeB4 & 0xff) << 8 * 4)
++				 	+ ((uint64_t) (byteAccBody->childSystemTimeB3 & 0xff) << 8 * 3)
++				 	+ ((uint64_t) (byteAccBody->childSystemTimeB2 & 0xff) << 8 * 2)
++			                + ((uint64_t) (byteAccBody->childSystemTimeB1 & 0xff) << 8 * 1)
++					+ ((uint64_t) (byteAccBody->childSystemTimeB0 & 0xff) << 8 * 0);
 +
 +		    ap_log_rerror(FCGI_LOG_NOTICE_NOERRNO, fr->r,
-+			"FastCGI: Byte packet processed: utime is %ld, stime is %ld, cutime is %ld, cstime = %ld", fr->utime, fr->stime, fr->cutime, fr->cstime);
++			"FastCGI: Byte packet processed: utime is %llu, stime is %llu, cutime is %llu, cstime = %llu", (unsigned long long int) fr->utime, (unsigned long long int) fr->stime, (unsigned long long int) fr->cutime, (unsigned long long int) fr->cstime);
 +
 +		    /* Set the request notes so we can print the rusage with mod_log through environment variables */
 +		    request_rec *last = fr->r;
 +                    while (last->next)
 +			last = last->next; // find the last request, we insert notes there
 +
-+		    apr_table_setn(last->notes, "ACC_utime", apr_psprintf(last->pool,  "%ld", fr->utime));
-+		    apr_table_setn(last->notes, "ACC_stime", apr_psprintf(last->pool,  "%ld", fr->stime));
-+		    apr_table_setn(last->notes, "ACC_cutime", apr_psprintf(last->pool, "%ld", fr->cutime));
-+		    apr_table_setn(last->notes, "ACC_cstime", apr_psprintf(last->pool, "%ld", fr->cstime));
++		    apr_table_setn(last->notes, "ACC_utime", apr_psprintf(last->pool,  "%llu", (unsigned long long int) fr->utime));
++		    apr_table_setn(last->notes, "ACC_stime", apr_psprintf(last->pool,  "%llu", (unsigned long long int) fr->stime));
++		    apr_table_setn(last->notes, "ACC_cutime", apr_psprintf(last->pool, "%llu", (unsigned long long int) fr->cutime));
++		    apr_table_setn(last->notes, "ACC_cstime", apr_psprintf(last->pool, "%llu", (unsigned long long int) fr->cstime));
 +
 +                    fr->readingByteAccBody = FALSE;
 +                }
@@ -173,8 +173,8 @@ Index: libapache-mod-fastcgi/fcgi_protocol.c
              case FCGI_UNKNOWN_TYPE:
 Index: libapache-mod-fastcgi/fcgi.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi.h	2011-09-02 12:39:38.496788812 +0200
-+++ libapache-mod-fastcgi/fcgi.h	2011-09-02 12:54:23.032252248 +0200
+--- libapache-mod-fastcgi.orig/fcgi.h	2011-09-02 17:18:19.509917526 +0200
++++ libapache-mod-fastcgi/fcgi.h	2011-09-02 17:22:09.373279623 +0200
 @@ -298,6 +298,17 @@
      Buffer *erBufPtr;
      int exitStatus;
@@ -195,8 +195,8 @@ Index: libapache-mod-fastcgi/fcgi.h
      int role;                       /* FastCGI Role: Authorizer or Responder */
 Index: libapache-mod-fastcgi/mod_fastcgi.c
 ===================================================================
---- libapache-mod-fastcgi.orig/mod_fastcgi.c	2011-09-02 12:37:48.071186053 +0200
-+++ libapache-mod-fastcgi/mod_fastcgi.c	2011-09-02 12:54:36.775525553 +0200
+--- libapache-mod-fastcgi.orig/mod_fastcgi.c	2011-09-02 17:22:09.279506641 +0200
++++ libapache-mod-fastcgi/mod_fastcgi.c	2011-09-02 17:22:09.384212697 +0200
 @@ -2539,6 +2539,11 @@
  #endif    
  	}

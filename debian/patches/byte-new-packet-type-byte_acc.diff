@@ -1,7 +1,7 @@
 Index: libapache-mod-fastcgi/fcgi_protocol.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi_protocol.h	2011-09-02 17:18:19.568226379 +0200
-+++ libapache-mod-fastcgi/fcgi_protocol.h	2011-09-02 17:22:09.353961455 +0200
+--- libapache-mod-fastcgi.orig/fcgi_protocol.h	2011-09-02 17:22:54.745799478 +0200
++++ libapache-mod-fastcgi/fcgi_protocol.h	2011-11-23 10:31:16.926506172 +0100
 @@ -52,7 +52,8 @@
  #define FCGI_DATA                8
  #define FCGI_GET_VALUES          9
@@ -65,8 +65,8 @@ Index: libapache-mod-fastcgi/fcgi_protocol.h
   * Variable names for FCGI_GET_VALUES / FCGI_GET_VALUES_RESULT records
 Index: libapache-mod-fastcgi/fcgi_protocol.c
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi_protocol.c	2011-09-02 17:18:19.528010849 +0200
-+++ libapache-mod-fastcgi/fcgi_protocol.c	2011-09-02 17:22:50.051259936 +0200
+--- libapache-mod-fastcgi.orig/fcgi_protocol.c	2011-09-02 17:22:54.803988652 +0200
++++ libapache-mod-fastcgi/fcgi_protocol.c	2011-11-23 10:31:53.121633798 +0100
 @@ -445,8 +445,8 @@
                          ap_log_rerror(FCGI_LOG_ERR_NOERRNO, fr->r,
                              "FastCGI: comm with server \"%s\" aborted: protocol error: "
@@ -152,7 +152,7 @@ Index: libapache-mod-fastcgi/fcgi_protocol.c
 +			                + ((uint64_t) (byteAccBody->childSystemTimeB1 & 0xff) << 8 * 1)
 +					+ ((uint64_t) (byteAccBody->childSystemTimeB0 & 0xff) << 8 * 0);
 +
-+		    ap_log_rerror(FCGI_LOG_NOTICE_NOERRNO, fr->r,
++		    ap_log_rerror(FCGI_LOG_DEBUG_NOERRNO, fr->r,
 +			"FastCGI: Byte packet processed: utime is %llu, stime is %llu, cutime is %llu, cstime = %llu", (unsigned long long int) fr->utime, (unsigned long long int) fr->stime, (unsigned long long int) fr->cutime, (unsigned long long int) fr->cstime);
 +
 +		    /* Set the request notes so we can print the rusage with mod_log through environment variables */
@@ -173,8 +173,8 @@ Index: libapache-mod-fastcgi/fcgi_protocol.c
              case FCGI_UNKNOWN_TYPE:
 Index: libapache-mod-fastcgi/fcgi.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi.h	2011-09-02 17:18:19.509917526 +0200
-+++ libapache-mod-fastcgi/fcgi.h	2011-09-02 17:22:09.373279623 +0200
+--- libapache-mod-fastcgi.orig/fcgi.h	2011-09-02 17:22:54.781936387 +0200
++++ libapache-mod-fastcgi/fcgi.h	2011-11-23 10:31:16.945183691 +0100
 @@ -298,6 +298,17 @@
      Buffer *erBufPtr;
      int exitStatus;
@@ -195,8 +195,8 @@ Index: libapache-mod-fastcgi/fcgi.h
      int role;                       /* FastCGI Role: Authorizer or Responder */
 Index: libapache-mod-fastcgi/mod_fastcgi.c
 ===================================================================
---- libapache-mod-fastcgi.orig/mod_fastcgi.c	2011-09-02 17:22:09.279506641 +0200
-+++ libapache-mod-fastcgi/mod_fastcgi.c	2011-09-02 17:22:09.384212697 +0200
+--- libapache-mod-fastcgi.orig/mod_fastcgi.c	2011-11-23 10:31:16.851544221 +0100
++++ libapache-mod-fastcgi/mod_fastcgi.c	2011-11-23 10:31:16.956141908 +0100
 @@ -2539,6 +2539,11 @@
  #endif    
  	}

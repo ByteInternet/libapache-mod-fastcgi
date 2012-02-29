@@ -1,7 +1,7 @@
 Index: libapache-mod-fastcgi/fcgi.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi.h	2012-02-28 14:51:12.000000000 +0100
-+++ libapache-mod-fastcgi/fcgi.h	2012-02-28 14:49:49.000000000 +0100
+--- libapache-mod-fastcgi.orig/fcgi.h	2012-02-29 20:03:19.080767200 +0100
++++ libapache-mod-fastcgi/fcgi.h	2012-02-29 20:03:19.138768056 +0100
 @@ -34,6 +34,10 @@
  #define APACHE2
  #endif
@@ -110,20 +110,28 @@ Index: libapache-mod-fastcgi/fcgi.h
  
 Index: libapache-mod-fastcgi/mod_fastcgi.c
 ===================================================================
---- libapache-mod-fastcgi.orig/mod_fastcgi.c	2012-02-28 14:51:12.000000000 +0100
-+++ libapache-mod-fastcgi/mod_fastcgi.c	2012-02-28 14:51:35.000000000 +0100
-@@ -97,6 +97,14 @@
+--- libapache-mod-fastcgi.orig/mod_fastcgi.c	2012-02-29 20:03:19.090231172 +0100
++++ libapache-mod-fastcgi/mod_fastcgi.c	2012-02-29 20:07:20.333628545 +0100
+@@ -97,6 +97,10 @@
  } while (0)
  #endif
  
 +
 +#include <http_log.h>
 +
-+#ifdef AP_DECLARE_MODULE
-+AP_DECLARE_MODULE(fastcgi);
-+#endif
-+
 +
  /*
   * Global variables
   */
+@@ -2972,7 +2976,11 @@
+     ap_hook_fixups(fixups, NULL, NULL, APR_HOOK_MIDDLE); 
+ }
+ 
++#ifdef APACHE24
++AP_DECLARE_MODULE(fastcgi) = {
++#else
+ module AP_MODULE_DECLARE_DATA fastcgi_module =
++#endif
+ {
+     STANDARD20_MODULE_STUFF,
+     fcgi_config_create_dir_config,  /* per-directory config creator */

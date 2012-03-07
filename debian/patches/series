@@ -1,5 +1,3 @@
 doc-misc-typo-fix.diff
-byte-simply-skip-duplicate-headers.diff
-byte-fix-compile-warnings-about-gid_t.diff
 byte-new-packet-type-byte_acc.diff
 byte-compile-against-apache24.diff

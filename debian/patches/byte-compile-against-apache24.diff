@@ -1,7 +1,7 @@
 Index: libapache-mod-fastcgi/fcgi.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi.h	2012-02-29 20:14:33.000000000 +0100
-+++ libapache-mod-fastcgi/fcgi.h	2012-02-29 20:14:33.000000000 +0100
+--- libapache-mod-fastcgi.orig/fcgi.h	2012-03-07 14:29:04.005720240 +0100
++++ libapache-mod-fastcgi/fcgi.h	2012-03-07 14:29:07.830566657 +0100
 @@ -34,6 +34,10 @@
  #define APACHE2
  #endif
@@ -30,7 +30,7 @@ Index: libapache-mod-fastcgi/fcgi.h
  
  #ifndef S_ISDIR
  #define S_ISDIR(m)      (((m)&(S_IFMT)) == (S_IFDIR))
-@@ -363,42 +373,42 @@
+@@ -365,42 +375,42 @@
  #ifdef APACHE2
  
  #ifdef WIN32
@@ -110,8 +110,8 @@ Index: libapache-mod-fastcgi/fcgi.h
  
 Index: libapache-mod-fastcgi/mod_fastcgi.c
 ===================================================================
---- libapache-mod-fastcgi.orig/mod_fastcgi.c	2012-02-29 20:14:33.000000000 +0100
-+++ libapache-mod-fastcgi/mod_fastcgi.c	2012-02-29 20:20:26.000000000 +0100
+--- libapache-mod-fastcgi.orig/mod_fastcgi.c	2012-03-07 14:29:04.017047773 +0100
++++ libapache-mod-fastcgi/mod_fastcgi.c	2012-03-07 14:29:07.841272721 +0100
 @@ -97,6 +97,10 @@
  } while (0)
  #endif
@@ -123,7 +123,7 @@ Index: libapache-mod-fastcgi/mod_fastcgi.c
  /*
   * Global variables
   */
-@@ -2972,7 +2976,11 @@
+@@ -3014,7 +3018,11 @@
      ap_hook_fixups(fixups, NULL, NULL, APR_HOOK_MIDDLE); 
  }
  

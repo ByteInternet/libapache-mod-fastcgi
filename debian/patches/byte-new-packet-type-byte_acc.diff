@@ -1,7 +1,7 @@
 Index: libapache-mod-fastcgi/fcgi_protocol.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi_protocol.h	2011-09-02 17:22:54.745799478 +0200
-+++ libapache-mod-fastcgi/fcgi_protocol.h	2011-11-23 10:31:16.926506172 +0100
+--- libapache-mod-fastcgi.orig/fcgi_protocol.h	2012-03-07 14:28:59.015865586 +0100
++++ libapache-mod-fastcgi/fcgi_protocol.h	2012-03-07 14:29:03.986142206 +0100
 @@ -52,7 +52,8 @@
  #define FCGI_DATA                8
  #define FCGI_GET_VALUES          9
@@ -65,9 +65,9 @@ Index: libapache-mod-fastcgi/fcgi_protocol.h
   * Variable names for FCGI_GET_VALUES / FCGI_GET_VALUES_RESULT records
 Index: libapache-mod-fastcgi/fcgi_protocol.c
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi_protocol.c	2011-09-02 17:22:54.803988652 +0200
-+++ libapache-mod-fastcgi/fcgi_protocol.c	2011-11-23 10:31:53.121633798 +0100
-@@ -445,8 +445,8 @@
+--- libapache-mod-fastcgi.orig/fcgi_protocol.c	2012-03-07 14:28:59.052540943 +0100
++++ libapache-mod-fastcgi/fcgi_protocol.c	2012-03-07 14:29:03.996101902 +0100
+@@ -475,8 +475,8 @@
                          ap_log_rerror(FCGI_LOG_ERR_NOERRNO, fr->r,
                              "FastCGI: comm with server \"%s\" aborted: protocol error: "
                              "invalid FCGI_END_REQUEST size: "
@@ -78,7 +78,7 @@ Index: libapache-mod-fastcgi/fcgi_protocol.c
                          return HTTP_INTERNAL_SERVER_ERROR;
                      }
                      fr->readingEndRequestBody = TRUE;
-@@ -478,6 +478,92 @@
+@@ -508,6 +508,92 @@
                      fr->readingEndRequestBody = FALSE;
                  }
                  break;
@@ -173,9 +173,9 @@ Index: libapache-mod-fastcgi/fcgi_protocol.c
              case FCGI_UNKNOWN_TYPE:
 Index: libapache-mod-fastcgi/fcgi.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi.h	2011-09-02 17:22:54.781936387 +0200
-+++ libapache-mod-fastcgi/fcgi.h	2011-11-23 10:31:16.945183691 +0100
-@@ -298,6 +298,17 @@
+--- libapache-mod-fastcgi.orig/fcgi.h	2012-03-07 14:28:59.034032444 +0100
++++ libapache-mod-fastcgi/fcgi.h	2012-03-07 14:29:04.005720240 +0100
+@@ -300,6 +300,17 @@
      Buffer *erBufPtr;
      int exitStatus;
      int exitStatusSet;
@@ -195,9 +195,9 @@ Index: libapache-mod-fastcgi/fcgi.h
      int role;                       /* FastCGI Role: Authorizer or Responder */
 Index: libapache-mod-fastcgi/mod_fastcgi.c
 ===================================================================
---- libapache-mod-fastcgi.orig/mod_fastcgi.c	2011-11-23 10:31:16.851544221 +0100
-+++ libapache-mod-fastcgi/mod_fastcgi.c	2011-11-23 10:31:16.956141908 +0100
-@@ -2539,6 +2539,11 @@
+--- libapache-mod-fastcgi.orig/mod_fastcgi.c	2012-03-07 14:28:59.073974365 +0100
++++ libapache-mod-fastcgi/mod_fastcgi.c	2012-03-07 14:29:04.017047773 +0100
+@@ -2572,6 +2572,11 @@
  #endif    
  	}
  

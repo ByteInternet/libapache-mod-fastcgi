@@ -1,3 +1,12 @@
+libapache-mod-fastcgi (2.4.7~0910052141-1byte3) unstable; urgency=low
+
+  * Incorporate the upstream release.
+    - gid_t fixes are now upstream.
+    - Status, Location and Content-Type headers may now be duplicated.
+      Drop the Byte patch.
+
+ -- Allard Hoeve <allard@byte.nl>  Wed, 07 Mar 2012 14:29:36 +0100
+
 libapache-mod-fastcgi (2.4.7~0910052141-1) unstable; urgency=low
 
   * New upstream release

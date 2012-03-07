@@ -1,0 +1,13 @@
+Index: libapache-mod-fastcgi/fcgi_config.c
+===================================================================
+--- libapache-mod-fastcgi.orig/fcgi_config.c	2012-03-07 14:44:07.526739982 +0100
++++ libapache-mod-fastcgi/fcgi_config.c	2012-03-07 14:44:17.712849230 +0100
+@@ -1204,7 +1204,7 @@
+     if (compat && strcasecmp(compat, "-compat"))
+         return ap_psprintf(cmd->temp_pool, "%s: unknown option: \"%s\"", cmd->cmd->name, compat);
+ 
+-    switch((int)cmd->info) {
++    switch((long)cmd->info) {
+         case FCGI_AUTH_TYPE_AUTHENTICATOR:
+             dir_config->authenticator = auth_server;
+             dir_config->authenticator_options |= (compat) ? FCGI_COMPAT : 0;

@@ -1,3 +1,4 @@
 doc-misc-typo-fix.diff
 byte-new-packet-type-byte_acc.diff
 byte-compile-against-apache24.diff
+byte-fix-cast-warning-in-fcgi_config.diff

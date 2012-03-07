@@ -1,5 +1,9 @@
 
 
+This fork of the mod_fastcgi code compiles against Apache 2.4.
+This fork of the FastCGI code compiles against apache24.
+
+
 PATCHES in the Byte branch
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

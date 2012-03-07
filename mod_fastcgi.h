@@ -1,11 +1,11 @@
 /*
- * $Id: mod_fastcgi.h,v 1.53 2007/11/13 12:26:35 robs Exp $
+ * $Id: mod_fastcgi.h,v 1.55 2009/09/29 00:31:55 robs Exp $
  */
 
 #ifndef MOD_FASTCGI_H
 #define MOD_FASTCGI_H
 
-#define MOD_FASTCGI_VERSION "2.4.6"
+#define MOD_FASTCGI_VERSION "mod_fastcgi-SNAP-0910052141"
 
 #define FASTCGI_HANDLER_NAME "fastcgi-script"
 
@@ -28,7 +28,7 @@
  * If all of the applications are based on a version of the FastCGI 
  * application library that properly handles the shutdown event
  * (fcgi2 v2.2.4), this can be set to <= 0 to prevent the use of
- * TerminateProcess() entirely.  If non of the applications support the
+ * TerminateProcess() entirely.  If none of the applications support the
  * termination event, this value can be set to 1.  It is highly reccomended
  * that the termination event be supported, as TerminateProcess() is a 
  * brutal way of taking down an application.

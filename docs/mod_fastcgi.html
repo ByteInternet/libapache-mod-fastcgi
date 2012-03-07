@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
-    <!-- $Id: mod_fastcgi.html,v 1.37 2007/10/29 00:21:59 robs Exp $ -->
+    <!-- $Id: mod_fastcgi.html,v 1.39 2008/09/22 00:28:56 robs Exp $ -->
     <HEAD>
         <TITLE>
             Apache module mod_fastcgi
@@ -391,9 +391,9 @@
                 <CODE><STRONG>-pass-header <EM>header</EM></STRONG> (none)</CODE>
             </DT>
             <DD>
-                The name of an HTTP Request Header to be passed in the <EM>request</EM> environment. This option makes
+                The name of a Request Header to be passed in the <EM>request</EM> environment. This option makes
                 available the contents of headers which are normally not available (e.g. Authorization) to a CGI
-                environment.
+                environment.  The passed header names are prefixed with "HTTP_" IAW the CGI specification.
             </DD>
             <DT>
                 <CODE><STRONG>-port <EM>n</EM></STRONG> (none)</CODE>
@@ -623,9 +623,9 @@
                 <CODE><STRONG>-pass-header <EM>header</EM></STRONG> (none)</CODE>
             </DT>
             <DD>
-                The name of an HTTP Request Header to be passed in the <EM>request</EM> environment. This option makes
+                The name of a Request Header to be passed in the <EM>request</EM> environment. This option makes
                 available the contents of headers which are normally not available (e.g. Authorization) to a CGI
-                environment.
+                environment.  The passed header names are prefixed with "HTTP_" IAW the CGI specification.
             </DD>
             <DT>
                 <CODE><STRONG>-priority <EM>n</EM></STRONG> (0)</CODE>
@@ -803,9 +803,9 @@
                 <CODE><STRONG>-pass-header <EM>header</EM></STRONG> (none)</CODE>
             </DT>
             <DD>
-                The name of an HTTP Request Header to be passed in the <EM>request</EM> environment. This option makes
+                The name of a Request Header to be passed in the <EM>request</EM> environment. This option makes
                 available the contents of headers which are normally not available (e.g. Authorization) to a CGI
-                environment.
+                environment.  The passed header names are prefixed with "HTTP_" IAW the CGI specification.
             </DD>
             <DT>
                 <CODE><STRONG>-socket <EM>filename</EM></STRONG> (none)</CODE>

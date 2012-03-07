@@ -1,3 +1,48 @@
+
+
+PATCHES in the Byte branch
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Hey there! You found the Byte branch. Well done.
+
+We keep some patches in here:
+
+* byte-compile-against-apache24.diff
+
+Compile against Apache 2.4
+
+* byte-fix-compile-warnings-about-gid_t.diff
+
+A warning is an error waiting to happen :)
+
+Fix warnings about the wrong type of gid_t. This is fixed on 32 bits systems
+where functions do not always return a long int, but a normal int. On 64 bits
+systems, this is fine, because long ints are default. Cast them to long int on
+32 bits systems.
+
+* byte-new-packet-type-byte_acc.diff
+
+This is a new FCGI packet type that we invented to transport CPU usage information
+from the FCGI process manager to the Apache webserver. You should not apply this
+patch if you do not also have the FCGI packet implemented, allthough it should not
+hurt to have support for this packet.
+
+* byte-simply-skip-duplicate-headers.diff
+
+The Apache errorlog is full of errors about applications that send a HTTP header 
+twice. This does not help us, because it breaks those applications (error 500). 
+These duplicate headers are not harmful and we need this to work for customers.
+
+Therefore: do not croak on duplicate headers.
+
+* doc-misc-typo-fix.diff
+
+This is a Debian patch. Typo's, ah well. 
+
+
+
+
+
 README for mod_fastcgi
 ~~~~~~~~~~~~~~~~~~~~~~
 mod_fastcgi is a module for the Apache web server, that enables

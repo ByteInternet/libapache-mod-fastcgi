@@ -1,8 +1,8 @@
 Index: libapache-mod-fastcgi/fcgi.h
 ===================================================================
---- libapache-mod-fastcgi.orig/fcgi.h	2012-03-07 14:29:04.005720240 +0100
-+++ libapache-mod-fastcgi/fcgi.h	2012-03-07 14:29:07.830566657 +0100
-@@ -34,6 +34,10 @@
+--- libapache-mod-fastcgi.orig/fcgi.h	2008-09-22 06:36:06.000000000 -0400
++++ libapache-mod-fastcgi/fcgi.h	2013-12-01 10:17:42.480086695 -0500
+@@ -34,6 +34,14 @@
  #define APACHE2
  #endif
  
@@ -10,10 +10,14 @@ Index: libapache-mod-fastcgi/fcgi.h
 +#define APACHE24
 +#endif
 +
++#ifdef APLOG_USE_MODULE
++APLOG_USE_MODULE(fastcgi);
++#endif
++
  #ifdef APACHE2
  
  #include <sys/stat.h>
-@@ -57,10 +61,16 @@
+@@ -57,10 +65,16 @@
  #define XtOffsetOf APR_OFFSETOF
  #define ap_select select
  
@@ -30,7 +34,7 @@ Index: libapache-mod-fastcgi/fcgi.h
  
  #ifndef S_ISDIR
  #define S_ISDIR(m)      (((m)&(S_IFMT)) == (S_IFDIR))
-@@ -365,42 +375,42 @@
+@@ -354,42 +368,42 @@
  #ifdef APACHE2
  
  #ifdef WIN32
@@ -110,8 +114,8 @@ Index: libapache-mod-fastcgi/fcgi.h
  
 Index: libapache-mod-fastcgi/mod_fastcgi.c
 ===================================================================
---- libapache-mod-fastcgi.orig/mod_fastcgi.c	2012-03-07 14:29:04.017047773 +0100
-+++ libapache-mod-fastcgi/mod_fastcgi.c	2012-03-07 14:29:07.841272721 +0100
+--- libapache-mod-fastcgi.orig/mod_fastcgi.c	2008-11-09 09:31:03.000000000 -0500
++++ libapache-mod-fastcgi/mod_fastcgi.c	2013-12-01 10:16:51.472085611 -0500
 @@ -97,6 +97,10 @@
  } while (0)
  #endif
@@ -123,15 +127,3 @@ Index: libapache-mod-fastcgi/mod_fastcgi.c
  /*
   * Global variables
   */
-@@ -3014,7 +3018,11 @@
-     ap_hook_fixups(fixups, NULL, NULL, APR_HOOK_MIDDLE); 
- }
- 
-+#ifdef APACHE24
-+AP_DECLARE_MODULE(fastcgi) =
-+#else
- module AP_MODULE_DECLARE_DATA fastcgi_module =
-+#endif
- {
-     STANDARD20_MODULE_STUFF,
-     fcgi_config_create_dir_config,  /* per-directory config creator */

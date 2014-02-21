@@ -7,7 +7,7 @@ Index: libapache-mod-fastcgi/fcgi_config.c
          return ap_psprintf(cmd->temp_pool, "%s: unknown option: \"%s\"", cmd->cmd->name, compat);
  
 -    switch((int)cmd->info) {
-+    switch((long)cmd->info) {
++    switch((intptr_t)cmd->info) {
          case FCGI_AUTH_TYPE_AUTHENTICATOR:
              dir_config->authenticator = auth_server;
              dir_config->authenticator_options |= (compat) ? FCGI_COMPAT : 0;

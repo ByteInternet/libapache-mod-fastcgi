@@ -341,6 +341,7 @@ static apcb_t init_module(server_rec *s, pool *p)
         if (rv == APR_INCHILD)
         {
             /* child */
+            ap_close_listeners();
             fcgi_pm_main(NULL);
             exit(1);
         }

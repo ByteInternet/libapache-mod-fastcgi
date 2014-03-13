@@ -201,7 +201,8 @@ static void shutdown_all()
         /* Send KILL to all processes */
         for (i = 0; i < numChildren; i++, proc++) 
         {
-            if (proc->state == FCGI_RUNNING_STATE) 
+            if (proc->state == FCGI_RUNNING_STATE
+                || proc->state == FCGI_VICTIM_STATE)
             {
                 fcgi_kill(proc, SIGKILL);
             }
